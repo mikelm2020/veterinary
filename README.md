@@ -37,7 +37,7 @@
   <h3 align="center">veterinary</h3>
 
   <p align="center">
-    A manager for playlist's streaming videos in local mode!
+    API to manage a veterinary clinic
     <br />
     <a href="https://github.com/mikelm2020/veterinary"><strong>Explore the docs »</strong></a>
     <br />
