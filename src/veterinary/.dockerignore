@@ -1,0 +1,12 @@
+.venv
+*.log
+.dockerignore
+.git
+.gitignore
+build/*
+Dockerfile
+README.md
+secret.json
+LICENSE
+.vscode
+
