@@ -27,13 +27,15 @@ BASE_APPS = [
     "django.contrib.staticfiles",
 ]
 
-LOCAL_APPS = []
+LOCAL_APPS = [
+    "apps.employees",
+    "apps.clinic",
+]
 
 THIRD_APPS = [
-    # "rest_framework",
+    "rest_framework",
     # "rest_framework_simplejwt",
     # "rest_framework_simplejwt.token_blacklist",
-    # "simple_history",
     # "django_filters",
     # "drf_spectacular",
 ]
@@ -91,6 +93,8 @@ TIME_ZONE = "America/Mexico_City"
 USE_I18N = True
 
 USE_TZ = True
+
+AUTH_USER_MODEL = "employees.Employee"
 
 
 # Static files (CSS, JavaScript, Images)

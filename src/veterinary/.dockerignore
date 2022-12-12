@@ -6,7 +6,6 @@
 build/*
 Dockerfile
 README.md
-secret.json
 LICENSE
 .vscode
 
