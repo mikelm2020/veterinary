@@ -10,5 +10,3 @@ psycopg2-binary==2.9.5
 pytz==2022.6
 sqlparse==0.4.3
 tomli==2.0.1
-dj-rest-auth
-dj-rest-auth[with_social]
