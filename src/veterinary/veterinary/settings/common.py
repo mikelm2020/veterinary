@@ -28,12 +28,13 @@ BASE_APPS = [
 ]
 
 LOCAL_APPS = [
-    "apps.employees",
+    "apps.users",
     "apps.clinic",
 ]
 
 THIRD_APPS = [
     "rest_framework",
+    "rest_framework.authtoken",
     # "rest_framework_simplejwt",
     # "rest_framework_simplejwt.token_blacklist",
     # "django_filters",
@@ -94,7 +95,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-AUTH_USER_MODEL = "employees.Employee"
+AUTH_USER_MODEL = "users.User"
 
 
 # Static files (CSS, JavaScript, Images)
@@ -106,3 +107,13 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+}
