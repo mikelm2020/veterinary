@@ -38,7 +38,7 @@ THIRD_APPS = [
     # "rest_framework_simplejwt",
     # "rest_framework_simplejwt.token_blacklist",
     # "django_filters",
-    # "drf_spectacular",
+    "drf_spectacular",
 ]
 
 INSTALLED_APPS = BASE_APPS + LOCAL_APPS + THIRD_APPS
@@ -115,4 +115,14 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Veterinary Clinical API",
+    "DESCRIPTION": "Management of a veterinary clinical",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": True,
+    "COMPONENT_SPLIT_REQUEST": True,
+    # OTHER SETTINGS
 }

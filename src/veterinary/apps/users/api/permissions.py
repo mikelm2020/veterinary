@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission,SAFE_METHODS
+from rest_framework.permissions import BasePermission
 
 class IsAssistant(BasePermission):
 
@@ -24,7 +24,7 @@ class IsRecepcionist(BasePermission):
 class IsManager(BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        if request.user.user_type == "M":
+        if request.user.user_type == "G":
             return True
         return False
 
