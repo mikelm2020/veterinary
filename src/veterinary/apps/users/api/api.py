@@ -9,7 +9,6 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-
 class UserViewSet(viewsets.GenericViewSet):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserModelSerializer
@@ -36,3 +35,6 @@ class UserViewSet(viewsets.GenericViewSet):
         user = serializer.save()
         data = UserModelSerializer(user).data
         return Response(data, status=status.HTTP_201_CREATED)
+
+  
+

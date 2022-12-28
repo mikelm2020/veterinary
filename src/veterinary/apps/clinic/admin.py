@@ -1,3 +1,7 @@
 from django.contrib import admin
+from apps.clinic.models import Analysis, Treatment
 
-# Register your models here.
+admin.site.register(Analysis)
+admin.site.register(Treatment)
+
+

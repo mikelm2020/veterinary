@@ -37,3 +37,9 @@ class UserManager(BaseUserManager):
         return self._create_user(
             username, name, last_name, password, True, True, **extra_fields
         )
+
+    def assistants(self):
+        return self.filter(user_type="A")
+
+    def veterinaries(self):
+        return self.filter(user_type="V")

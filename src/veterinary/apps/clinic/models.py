@@ -22,7 +22,7 @@ class Treatment(models.Model):
 
     TREATMENT_TYPE_CHOICES = (
         (OPTIONAL, "Opcional"),
-        (MANDATORY, "Obliagtorio"),
+        (MANDATORY, "Obligatorio"),
     )
 
     # Periods
@@ -308,7 +308,7 @@ class Internship(models.Model):
         return f" Internado {self.reception} - {self.room}"
 
 
-class DicoverDesease(models.Model):
+class DicoverDisease(models.Model):
     diagnostic = models.OneToOneField(
         Diagnostic,
         on_delete=models.CASCADE,
