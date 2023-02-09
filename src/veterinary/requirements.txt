@@ -11,3 +11,4 @@ pytz==2022.6
 sqlparse==0.4.3
 tomli==2.0.1
 drf-spectacular
+django-rest-knox

@@ -5,7 +5,7 @@ from django.db import models
 class Analysis(models.Model):
     name = models.CharField("Nombre", max_length=50)
     description = models.CharField("Descrpción", max_length=100)
-    price = models.DecimalField("Precio", max_digits=5, decimal_places=2)
+    price = models.DecimalField("Precio", max_digits=7, decimal_places=2)
 
     class Meta:
         verbose_name = "Prueba"
@@ -51,7 +51,7 @@ class Treatment(models.Model):
     treatment_type = models.IntegerField(
         "Tipo", choices=TREATMENT_TYPE_CHOICES, default=0
     )
-    price = models.DecimalField("Precio", max_digits=5, decimal_places=2)
+    price = models.DecimalField("Precio", max_digits=7, decimal_places=2)
     period = models.IntegerField("Periodo", choices=PERIOD_CHOICES, default=0)
 
     class Meta:
@@ -76,7 +76,7 @@ class Hospitalization(models.Model):
     hospitalization_type = models.IntegerField(
         "Tipo", choices=HOSPITALIZATION_TYPE_CHOICES, default=0
     )
-    price = models.DecimalField("Precio", max_digits=5, decimal_places=2)
+    price = models.DecimalField("Precio", max_digits=7, decimal_places=2)
 
     class Meta:
         verbose_name = "Hospitalización"
@@ -343,7 +343,7 @@ class Invoice(models.Model):
         "Tipo de factura", choices=INVOICE_TYPE_CHOICES, default=1
     )
     pay_date = models.DateTimeField("Fecha de pago", auto_now=False, auto_now_add=False)
-    total = models.DecimalField("Total", max_digits=5, decimal_places=2)
+    total = models.DecimalField("Total", max_digits=7, decimal_places=2)
     reception = models.ForeignKey(
         Reception, on_delete=models.CASCADE, related_name="reception_of"
     )

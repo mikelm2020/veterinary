@@ -34,9 +34,7 @@ LOCAL_APPS = [
 
 THIRD_APPS = [
     "rest_framework",
-    "rest_framework.authtoken",
-    # "rest_framework_simplejwt",
-    # "rest_framework_simplejwt.token_blacklist",
+    "knox",
     # "django_filters",
     "drf_spectacular",
 ]
@@ -113,7 +111,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.TokenAuthentication",
+        "knox.auth.TokenAuthentication",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
@@ -125,4 +123,8 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": True,
     "COMPONENT_SPLIT_REQUEST": True,
     # OTHER SETTINGS
+}
+
+REST_KNOX = {
+    'USER_SERIALIZER': 'apps.users.api.serializers.UserModelSerializer'
 }
