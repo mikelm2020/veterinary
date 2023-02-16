@@ -80,3 +80,15 @@ class ReceptionViewSet(viewsets.ModelViewSet):
     queryset = Reception.objects.all()
     serializer_class = ReceptionModelSerializer
     permission_classes = [IsRecepcionist,IsAuthenticated]
+
+class DisplacementViewSet(viewsets.ModelViewSet):
+    """
+    List, create, update, retrieve and delete diplacements
+    """
+
+    queryset = Displacement.objects.all()
+    serializer_class = DisplacementModelSerializer
+    permission_classes = [IsAssistant, IsAuthenticated, IsOwner]
+
+    def perform_create(self, serializer):
+        serializer.save(assistant=self.request.user)

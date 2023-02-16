@@ -81,9 +81,7 @@ class ReceptionModelSerializer(serializers.ModelSerializer):
 
 
 class DisplacementModelSerializer(serializers.ModelSerializer):
-    reception = serializers.HyperlinkedRelatedField(
-        many=True, read_only=True, view_name="reception-detail"
-    )
+    reception = serializers.PrimaryKeyRelatedField(queryset=Reception.objects.all())
     assistant = serializers.ReadOnlyField(source="assistant.username")
 
 
@@ -98,7 +96,7 @@ class DisplacementModelSerializer(serializers.ModelSerializer):
         )
 
 class AssistantSerializer(serializers.ModelSerializer):
-    assistant_perform = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.assistants())
+    assistant_perform = serializers.PrimaryKeyRelatedField(queryset=User.objects.assistants())
 
     class Meta:
         model = User
