@@ -19,7 +19,7 @@ class AnalysisViewset(viewsets.ReadOnlyModelViewSet):
 
     queryset = Analysis.objects.all()
     serializer_class = AnalysisModelSerializer
-    permission_classes = [IsVeterinary, IsAuthenticated]
+    permission_classes = [IsVeterinary]
 
 
 class TreatmentViewset(viewsets.ReadOnlyModelViewSet):
@@ -29,7 +29,7 @@ class TreatmentViewset(viewsets.ReadOnlyModelViewSet):
 
     queryset = Treatment.objects.all()
     serializer_class = TreatmentModelSerializer
-    permission_classes = [IsVeterinary, IsAuthenticated]
+    permission_classes = [IsVeterinary]
 
 
 class HospitalizationViewset(viewsets.ReadOnlyModelViewSet):
@@ -39,7 +39,7 @@ class HospitalizationViewset(viewsets.ReadOnlyModelViewSet):
 
     queryset = Hospitalization.objects.all()
     serializer_class = HospitalizationModelSerializer
-    permission_classes = [IsRecepcionist, IsAuthenticated]
+    permission_classes = [IsRecepcionist]
 
 
 class ProprietorViewset(viewsets.ModelViewSet):
@@ -49,7 +49,7 @@ class ProprietorViewset(viewsets.ModelViewSet):
 
     queryset = Proprietor.objects.all()
     serializer_class = ProprietorModelSerializer
-    permission_classes = [IsRecepcionist, IsAuthenticated]
+    permission_classes = [IsRecepcionist]
 
 
 class DiseaseViewset(viewsets.ModelViewSet):
@@ -59,7 +59,7 @@ class DiseaseViewset(viewsets.ModelViewSet):
 
     queryset = Disease.objects.all()
     serializer_class = DiseaseModelSerializer
-    permission_classes = [IsVeterinary, IsAuthenticated]
+    permission_classes = [IsVeterinary]
 
 
 class PetViewset(viewsets.ModelViewSet):
@@ -79,7 +79,7 @@ class ReceptionViewSet(viewsets.ModelViewSet):
 
     queryset = Reception.objects.all()
     serializer_class = ReceptionModelSerializer
-    permission_classes = [IsRecepcionist,IsAuthenticated]
+    permission_classes = [IsRecepcionist | IsAssistant]
 
 class DisplacementViewSet(viewsets.ModelViewSet):
     """
@@ -88,7 +88,9 @@ class DisplacementViewSet(viewsets.ModelViewSet):
 
     queryset = Displacement.objects.all()
     serializer_class = DisplacementModelSerializer
-    permission_classes = [IsAssistant, IsAuthenticated, IsOwner]
+    permission_classes = [IsAssistant]
 
     def perform_create(self, serializer):
         serializer.save(assistant=self.request.user)
+
+    

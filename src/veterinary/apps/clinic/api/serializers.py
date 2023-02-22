@@ -2,10 +2,12 @@ from apps.clinic.models import *
 from rest_framework import serializers
 from apps.users.models import User
 
+
 class AnalysisModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Analysis
         fields = (
+            "id",
             "name",
             "description",
             "price",
@@ -16,6 +18,7 @@ class TreatmentModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Treatment
         fields = (
+            "id",
             "name",
             "description",
             "treatment_type",
@@ -28,6 +31,7 @@ class HospitalizationModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hospitalization
         fields = (
+            "id",
             "hospitalization_type",
             "price",
         )
@@ -37,6 +41,7 @@ class ProprietorModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Proprietor
         fields = (
+            "id",
             "name",
             "last_name",
             "address",
@@ -49,6 +54,7 @@ class DiseaseModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Disease
         fields = (
+            "id",
             "name",
             "description",
             "mandatory_declaration",
@@ -59,6 +65,7 @@ class PetModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pet
         fields = (
+            "id",
             "name",
             "kind",
             "breed",
@@ -73,6 +80,7 @@ class ReceptionModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reception
         fields = (
+            "id",
             "register_date",
             "reason",
             "condition",
@@ -84,10 +92,10 @@ class DisplacementModelSerializer(serializers.ModelSerializer):
     reception = serializers.PrimaryKeyRelatedField(queryset=Reception.objects.all())
     assistant = serializers.ReadOnlyField(source="assistant.username")
 
-
     class Meta:
         model = Displacement
         fields = (
+            "id",
             "displacement_date",
             "price",
             "alternate_address",
@@ -95,104 +103,100 @@ class DisplacementModelSerializer(serializers.ModelSerializer):
             "assistant",
         )
 
+
 class AssistantSerializer(serializers.ModelSerializer):
-    assistant_perform = serializers.PrimaryKeyRelatedField(queryset=User.objects.assistants())
+    assistant_perform = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.assistants()
+    )
 
     class Meta:
         model = User
-        fields = (
-            "id",
-            "username",
-            "assistant_perform"
-        )
+        fields = ("id", "username", "assistant_perform")
+
 
 class DiagnosticModelSerializer(serializers.ModelSerializer):
-    reception = serializers.HyperlinkedRelatedField(
-        many=True, read_only=True, view_name="reception-detail"
-    )
-    analysis = serializers.HyperlinkedRelatedField(
-        many= True, read_only=True, view_name="analysis-detail"
-    )
+    reception = serializers.PrimaryKeyRelatedField(queryset=Reception.objects.all())
+    analysis = serializers.PrimaryKeyRelatedField(queryset=Analysis.objects.all())
 
     class Meta:
         model = Diagnostic
         fields = (
+            "id",
             "diagnostic_date",
             "result",
             "reception",
             "analysis",
         )
 
+
 class TreatmentAppliedModelSerializer(serializers.ModelSerializer):
-    reception = serializers.HyperlinkedRelatedField(
-        many=True, read_only=True, view_name="reception-detail"
-    )
+    reception = serializers.PrimaryKeyRelatedField(queryset=Reception.objects.all())
     veterinary = serializers.ReadOnlyField(source="veterinary.username")
 
     class Meta:
-        model= TreatmentApplied
+        model = TreatmentApplied
         fields = (
+            "id",
             "treatment_applied_type",
             "treatment_applied_date",
             "observation",
             "reception",
-            "veterinary"
+            "veterinary",
         )
 
+
 class VeterinarySerializer(serializers.ModelSerializer):
-    veterinary_perform = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.veterinaries())
+    veterinary_perform = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=User.objects.veterinaries()
+    )
 
     class Meta:
         model = User
-        fields = (
-            "id",
-            "username",
-            "veterinary_perform"
-        )
+        fields = ("id", "username", "veterinary_perform")
+
 
 class MandatoryTreatmentModelSerializer(serializers.ModelSerializer):
-    treatment_applied = serializers.HyperlinkedRelatedField(
-        many=False, read_only=True, view_name="treatment_applied-detail"
+    treatment_applied = serializers.PrimaryKeyRelatedField(
+        queryset=TreatmentApplied.objects.all()
     )
-    treatment = serializers.HyperlinkedRelatedField(
-        many=True, read_only= True, view_name="treatment-detail"
-    )
+    treatment = serializers.PrimaryKeyRelatedField(queryset=Treatment.objects.all())
 
     class Meta:
         model = MandatoryTreatment
         fields = (
+            "id",
             "treatment_applied",
             "treatment",
             "drug",
             "drug_serial",
         )
 
+
 class OptionalTreatmentModelSerializer(serializers.ModelSerializer):
-    treatment_applied = serializers.HyperlinkedRelatedField(
-        many=False, read_only=True, view_name="treatment_applied-detail"
+    treatment_applied = serializers.PrimaryKeyRelatedField(
+        queryset=TreatmentApplied.objects.all()
     )
-    treatment = serializers.HyperlinkedRelatedField(
-        many=True, read_only= True, view_name="treatment-detail"
-    )
+    treatment = serializers.PrimaryKeyRelatedField(queryset=Treatment.objects.all())
 
     class Meta:
         model = OptionalTreatment
         fields = (
+            "id",
             "treatment_applied",
             "treatment",
         )
 
+
 class InternshipModelSerializer(serializers.ModelSerializer):
-    reception = serializers.HyperlinkedRelatedField(
-        many=False, read_only= True, view_name="recéption-detail"
-    )
-    hospitalization = serializers.HyperlinkedRelatedField(
-        many=True, read_only=True, view_name="hospitalization-detail"
+    reception = serializers.PrimaryKeyRelatedField(queryset=Reception.objects.all())
+    hospitalization = serializers.PrimaryKeyRelatedField(
+        queryset=Hospitalization.objects.all()
     )
 
     class Meta:
         model = Internship
-        fields= (
+        fields = (
+            "id",
             "reception",
             "hospitalization",
             "initial_date",
@@ -200,31 +204,30 @@ class InternshipModelSerializer(serializers.ModelSerializer):
             "room",
         )
 
+
 class DiscoverDiseaseModelSerializer(serializers.ModelSerializer):
-    diagnostic = serializers.HyperlinkedRelatedField(
-        many=False, read_only= True, view_name="diagnostic-detail"
-    )
-    disease = serializers.HyperlinkedRelatedField(
-        many=True, read_only=True, view_name="disease-detail"
-    )
+    diagnostic = serializers.PrimaryKeyRelatedField(queryset=Diagnostic.objects.all())
+    disease = serializers.PrimaryKeyRelatedField(queryset=Disease.objects.all())
+
     class Meta:
         model = DicoverDisease
         fields = (
+            "id",
             "diagnostic",
             "disease",
         )
 
+
 class InvoiceModelSerializer(serializers.ModelSerializer):
-    reception = serializers.HyperlinkedRelatedField(
-        many=False, read_only= True, view_name="recéption-detail"
-    )
+    reception = serializers.PrimaryKeyRelatedField(queryset=Reception.objects.all())
+
     class Meta:
         model = Invoice
         fields = (
+            "id",
             "emission_date",
             "invoice_type",
             "pay_date",
             "total",
             "reception",
         )
-        
