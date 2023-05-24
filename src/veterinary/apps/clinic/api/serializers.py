@@ -88,9 +88,27 @@ class ReceptionModelSerializer(serializers.ModelSerializer):
         )
 
 
+class ListDisplacementModelSerializer(serializers.ModelSerializer):
+    reception = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="receptions-detail"
+    )
+    assistant = serializers.PrimaryKeyRelatedField(queryset=User.objects.assistants())
+
+    class Meta:
+        model = Displacement
+        fields = (
+            "id",
+            "displacement_date",
+            "price",
+            "alternate_address",
+            "reception",
+            "assistant",
+        )
+
+
 class DisplacementModelSerializer(serializers.ModelSerializer):
     reception = serializers.PrimaryKeyRelatedField(queryset=Reception.objects.all())
-    assistant = serializers.ReadOnlyField(source="assistant.username")
+    assistant = serializers.PrimaryKeyRelatedField(queryset=User.objects.assistants())
 
     class Meta:
         model = Displacement
@@ -129,8 +147,29 @@ class DiagnosticModelSerializer(serializers.ModelSerializer):
         )
 
 
+class ListDiagnosticModelSerializer(serializers.ModelSerializer):
+    reception = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="receptions-detail"
+    )
+    analysis = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="analysis-detail"
+    )
+
+    class Meta:
+        model = Diagnostic
+        fields = (
+            "id",
+            "diagnostic_date",
+            "result",
+            "reception",
+            "analysis",
+        )
+
+
 class TreatmentAppliedModelSerializer(serializers.ModelSerializer):
-    reception = serializers.PrimaryKeyRelatedField(queryset=Reception.objects.all())
+    reception = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="receptions-detail"
+    )
     veterinary = serializers.ReadOnlyField(source="veterinary.username")
 
     class Meta:
@@ -159,7 +198,9 @@ class MandatoryTreatmentModelSerializer(serializers.ModelSerializer):
     treatment_applied = serializers.PrimaryKeyRelatedField(
         queryset=TreatmentApplied.objects.all()
     )
-    treatment = serializers.PrimaryKeyRelatedField(queryset=Treatment.objects.all())
+    treatment = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="treatments-detail"
+    )
 
     class Meta:
         model = MandatoryTreatment
@@ -176,7 +217,9 @@ class OptionalTreatmentModelSerializer(serializers.ModelSerializer):
     treatment_applied = serializers.PrimaryKeyRelatedField(
         queryset=TreatmentApplied.objects.all()
     )
-    treatment = serializers.PrimaryKeyRelatedField(queryset=Treatment.objects.all())
+    treatment = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="treatments-detail"
+    )
 
     class Meta:
         model = OptionalTreatment
@@ -188,9 +231,11 @@ class OptionalTreatmentModelSerializer(serializers.ModelSerializer):
 
 
 class InternshipModelSerializer(serializers.ModelSerializer):
-    reception = serializers.PrimaryKeyRelatedField(queryset=Reception.objects.all())
-    hospitalization = serializers.PrimaryKeyRelatedField(
-        queryset=Hospitalization.objects.all()
+    reception = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="receptions-detail"
+    )
+    hospitalization = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="hospitalizations-detail"
     )
 
     class Meta:
@@ -207,7 +252,9 @@ class InternshipModelSerializer(serializers.ModelSerializer):
 
 class DiscoverDiseaseModelSerializer(serializers.ModelSerializer):
     diagnostic = serializers.PrimaryKeyRelatedField(queryset=Diagnostic.objects.all())
-    disease = serializers.PrimaryKeyRelatedField(queryset=Disease.objects.all())
+    disease = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="diseases-detail"
+    )
 
     class Meta:
         model = DicoverDisease
@@ -219,7 +266,9 @@ class DiscoverDiseaseModelSerializer(serializers.ModelSerializer):
 
 
 class InvoiceModelSerializer(serializers.ModelSerializer):
-    reception = serializers.PrimaryKeyRelatedField(queryset=Reception.objects.all())
+    reception = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="receptions-detail"
+    )
 
     class Meta:
         model = Invoice

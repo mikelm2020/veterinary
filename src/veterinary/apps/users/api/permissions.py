@@ -24,7 +24,3 @@ class IsManager(BasePermission):
         if request.user.user_type == "G":
             return True
         return False
-
-class IsOwner(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return obj.user == request.user
