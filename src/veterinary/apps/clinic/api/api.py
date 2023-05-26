@@ -1,5 +1,6 @@
 from apps.clinic.api.serializers import *
 from apps.clinic.models import *
+from apps.clinic.pagination import ExtendedPagination
 from apps.users.api.permissions import (
     IsAssistant,
     IsManager,
@@ -7,6 +8,13 @@ from apps.users.api.permissions import (
     IsVeterinary,
 )
 from django.shortcuts import get_object_or_404
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiParameter,
+    extend_schema,
+    extend_schema_view,
+)
 from knox.auth import TokenAuthentication
 from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -21,6 +29,7 @@ class AnalysisViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Analysis.objects.all()
     serializer_class = AnalysisModelSerializer
     permission_classes = [IsVeterinary]
+    pagination_class = ExtendedPagination
 
 
 class TreatmentViewset(viewsets.ReadOnlyModelViewSet):
@@ -31,6 +40,7 @@ class TreatmentViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Treatment.objects.all()
     serializer_class = TreatmentModelSerializer
     permission_classes = [IsVeterinary | IsManager]
+    pagination_class = ExtendedPagination
 
 
 class HospitalizationViewset(viewsets.ReadOnlyModelViewSet):
@@ -41,6 +51,7 @@ class HospitalizationViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Hospitalization.objects.all()
     serializer_class = HospitalizationModelSerializer
     permission_classes = [IsRecepcionist | IsManager]
+    pagination_class = ExtendedPagination
 
 
 class ProprietorViewset(viewsets.ModelViewSet):
@@ -51,6 +62,7 @@ class ProprietorViewset(viewsets.ModelViewSet):
     queryset = Proprietor.objects.all()
     serializer_class = ProprietorModelSerializer
     permission_classes = [IsRecepcionist]
+    pagination_class = ExtendedPagination
 
 
 class DiseaseViewset(viewsets.ModelViewSet):
@@ -61,6 +73,7 @@ class DiseaseViewset(viewsets.ModelViewSet):
     queryset = Disease.objects.all()
     serializer_class = DiseaseModelSerializer
     permission_classes = [IsVeterinary]
+    pagination_class = ExtendedPagination
 
 
 class PetViewset(viewsets.ModelViewSet):
@@ -71,6 +84,7 @@ class PetViewset(viewsets.ModelViewSet):
     queryset = Pet.objects.all()
     serializer_class = PetModelSerializer
     permission_classes = [IsManager | IsVeterinary | IsRecepcionist]
+    pagination_class = ExtendedPagination
 
 
 class ReceptionViewSet(viewsets.ModelViewSet):
@@ -81,27 +95,16 @@ class ReceptionViewSet(viewsets.ModelViewSet):
     queryset = Reception.objects.all()
     serializer_class = ReceptionModelSerializer
     permission_classes = [IsRecepcionist | IsAssistant | IsVeterinary]
-
-
-# class DisplacementViewSet(viewsets.ModelViewSet):
-#     """
-#     List, create, update, retrieve and delete displacements
-#     """
-
-#     queryset = Displacement.objects.all()
-#     serializer_class = DisplacementModelSerializer
-#     permission_classes = [IsRecepcionist | IsAssistant | IsVeterinary]
-
+    pagination_class = ExtendedPagination
 
 class DisplacementViewSet(viewsets.GenericViewSet):
-
     """
-    List, create, update, retrieve and delete diplacements
+    List, create, update and retrieve diplacements
     """
 
     serializer_class = DisplacementModelSerializer
     list_serializer_class = ListDisplacementModelSerializer
-
+    pagination_class = ExtendedPagination
     permission_classes = [IsAssistant | IsManager]
 
     def get_queryset(self, pk=None):
@@ -123,7 +126,9 @@ class DisplacementViewSet(viewsets.GenericViewSet):
 
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = self.list_serializer_class(page, many=True)
+            serializer = self.list_serializer_class(
+                page, many=True, context={"request": request}
+            )
             return self.get_paginated_response(serializer.data)
 
         serializer = self.list_serializer_class(
@@ -149,13 +154,13 @@ class DisplacementViewSet(viewsets.GenericViewSet):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # @extend_schema(
-    #     parameters=[
-    #         OpenApiParameter(
-    #             name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH
-    #         ),
-    #     ],
-    # )
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH
+            ),
+        ],
+    )
     def retrieve(self, request, pk=None):
         """
         Get a displacement
@@ -164,39 +169,73 @@ class DisplacementViewSet(viewsets.GenericViewSet):
         displacement_serializer = self.list_serializer_class(displacement)
         return Response(displacement_serializer.data)
 
-    # @extend_schema(
-    #     parameters=[
-    #         OpenApiParameter(
-    #             name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH
-    #         ),
-    #     ],
-    # )
-    def destroy(self, request, pk=None):
+
+class DiagnosticViewSet(viewsets.GenericViewSet):
+    """
+    List, create, update and retrieve diagnostics
+    """
+
+    serializer_class = DiagnosticModelSerializer
+    list_serializer_class = ListDiagnosticModelSerializer
+    pagination_class = ExtendedPagination
+    permission_classes = [IsVeterinary | IsManager]
+
+    def get_queryset(self, pk=None):
+        if pk is None:
+            return Diagnostic.objects.all()
+        else:
+            return Diagnostic.objects.filter(id=pk).first()
+
+    def get_object(self, pk):
+        return get_object_or_404(Diagnostic, pk=pk)
+
+    def list(self, request, *args, **kwargs):
         """
-        Delete a displacement in logical mode
+        Get a collection of diagnostics
         """
-        displacement_destroy = self.serializer_class.Meta.model.objects.filter(
-            id=pk
-        ).update(state=False)
-        if displacement_destroy == 1:
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.list_serializer_class(
+                page, many=True, context={"request": request}
+            )
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.list_serializer_class(
+            queryset, many=True, context={"request": request}
+        )
+        return Response(serializer.data)
+
+    def create(self, request):
+        """
+        Create a diagnostic
+        """
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+
             return Response(
-                {"message": "desplazamiento eliminada correctamente!"},
-                status=status.HTTP_200_OK,
+                {"message": "diagnóstico registrado correctamente"},
+                status=status.HTTP_201_CREATED,
             )
         return Response(
-            {"message": "No existe el desplazamiento que desea eliminar"},
-            status=status.HTTP_404_NOT_FOUND,
+            {"message": "Hay errores en el registro", "error": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # def perform_create(self, serializer):
-    #     serializer.save(assistant=self.request.user)
-
-
-class DiagnosticViewset(viewsets.ModelViewSet):
-    """
-    List, create, update, retrieve and delete diagnostics
-    """
-
-    queryset = Diagnostic.objects.all()
-    serializer_class = DiagnosticModelSerializer
-    permission_classes = [IsVeterinary | IsManager]
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH
+            ),
+        ],
+    )
+    def retrieve(self, request, pk=None):
+        """
+        Get a diagnostic
+        """
+        diagnostic = self.get_object(pk)
+        diagnostic_serializer = self.list_serializer_class(diagnostic)
+        return Response(diagnostic_serializer.data)
