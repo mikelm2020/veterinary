@@ -221,7 +221,7 @@ class TreatmentApplied(models.Model):
     treatment_applied_type = models.IntegerField(
         "Tipo de tratamienio aplicado", choices=TREATMENTAPPLIED_TYPE_CHOICES, default=1
     )
-    treatment_appied_date = models.DateTimeField(
+    treatment_applied_date = models.DateTimeField(
         "Fecha de tratamiento aplicado", auto_now=False, auto_now_add=False
     )
     observation = models.CharField("Observaciones", max_length=100)
@@ -237,7 +237,7 @@ class TreatmentApplied(models.Model):
         verbose_name_plural = "Tratamientos aplicados"
 
     def __str__(self):
-        return f" Tratamiento aplicado {self.pk} - {self.treatment_appied_date}"
+        return f" Tratamiento aplicado {self.pk} - {self.treatment_applied_date}"
 
 
 class MandatoryTreatment(models.Model):

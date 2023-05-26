@@ -94,8 +94,9 @@ class ReceptionViewSet(viewsets.ModelViewSet):
 
     queryset = Reception.objects.all()
     serializer_class = ReceptionModelSerializer
-    permission_classes = [IsRecepcionist | IsAssistant | IsVeterinary]
+    permission_classes = [IsRecepcionist | IsAssistant | IsVeterinary | IsManager]
     pagination_class = ExtendedPagination
+
 
 class DisplacementViewSet(viewsets.GenericViewSet):
     """
@@ -239,3 +240,76 @@ class DiagnosticViewSet(viewsets.GenericViewSet):
         diagnostic = self.get_object(pk)
         diagnostic_serializer = self.list_serializer_class(diagnostic)
         return Response(diagnostic_serializer.data)
+
+
+class TreatmentAppliedViewSet(viewsets.GenericViewSet):
+    """
+    List, create, update and retrieve treatments applied
+    """
+
+    serializer_class = TreatmentAppliedModelSerializer
+    list_serializer_class = ListTreatmentAppliedModelSerializer
+    pagination_class = ExtendedPagination
+    permission_classes = [IsVeterinary | IsManager]
+
+    def get_queryset(self, pk=None):
+        if pk is None:
+            return TreatmentApplied.objects.filter(veterinary=self.request.user)
+        else:
+            return TreatmentApplied.objects.filter(
+                id=pk, veterinary=self.request.user
+            ).first()
+
+    def get_object(self, pk):
+        return get_object_or_404(TreatmentApplied, pk=pk)
+
+    def list(self, request, *args, **kwargs):
+        """
+        Get a collection of treatments applied
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.list_serializer_class(
+                page, many=True, context={"request": request}
+            )
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.list_serializer_class(
+            queryset, many=True, context={"request": request}
+        )
+        return Response(serializer.data)
+
+    def create(self, request):
+        """
+        Create a treatment applied
+        """
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save(veterinary=self.request.user)
+
+            return Response(
+                {"message": "tratamiento aplicado registrado correctamente"},
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(
+            {"message": "Hay errores en el registro", "error": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH
+            ),
+        ],
+    )
+    def retrieve(self, request, pk=None):
+        """
+        Get a treatment applied
+        """
+        treatment_applied = self.get_object(pk)
+        treatment_applied_serializer = self.list_serializer_class(treatment_applied)
+        return Response(treatment_applied_serializer.data)

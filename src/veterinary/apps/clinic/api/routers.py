@@ -13,6 +13,7 @@ router.register(r"pets", api.PetViewset, basename="pets")
 router.register(r"receptions", api.ReceptionViewSet, basename="receptions")
 router.register(r"displacements", api.DisplacementViewSet, basename="displacements")
 router.register(r"diagnostics", api.DiagnosticViewSet, basename="diagnostics")
+router.register(r"treatments-applied", api.TreatmentAppliedViewSet, basename="treatments-applied")
 
 
 urlpatterns = router.urls

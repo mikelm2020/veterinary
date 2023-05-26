@@ -166,11 +166,11 @@ class ListDiagnosticModelSerializer(serializers.ModelSerializer):
         )
 
 
-class TreatmentAppliedModelSerializer(serializers.ModelSerializer):
+class ListTreatmentAppliedModelSerializer(serializers.ModelSerializer):
     reception = serializers.HyperlinkedRelatedField(
         read_only=True, view_name="receptions-detail"
     )
-    veterinary = serializers.ReadOnlyField(source="veterinary.username")
+    veterinary = serializers.PrimaryKeyRelatedField(queryset=User.objects.veterinaries())
 
     class Meta:
         model = TreatmentApplied
@@ -183,6 +183,20 @@ class TreatmentAppliedModelSerializer(serializers.ModelSerializer):
             "veterinary",
         )
 
+class TreatmentAppliedModelSerializer(serializers.ModelSerializer):
+    reception = serializers.PrimaryKeyRelatedField(queryset=Reception.objects.all())
+    veterinary = serializers.PrimaryKeyRelatedField(queryset=User.objects.veterinaries())
+
+    class Meta:
+        model = TreatmentApplied
+        fields = (
+            "id",
+            "treatment_applied_type",
+            "treatment_applied_date",
+            "observation",
+            "reception",
+            "veterinary",
+        )
 
 class VeterinarySerializer(serializers.ModelSerializer):
     veterinary_perform = serializers.PrimaryKeyRelatedField(
