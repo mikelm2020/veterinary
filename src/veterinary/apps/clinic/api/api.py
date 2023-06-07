@@ -313,3 +313,82 @@ class TreatmentAppliedViewSet(viewsets.GenericViewSet):
         treatment_applied = self.get_object(pk)
         treatment_applied_serializer = self.list_serializer_class(treatment_applied)
         return Response(treatment_applied_serializer.data)
+
+# class MandatoryTreatmentViewSet(viewsets.ModelViewSet):
+
+#     queryset = MandatoryTreatment.objects.all()
+#     serializer_class = MandatoryTreatmentModelSerializer
+#     pagination_class = ExtendedPagination
+#     permission_classes = [IsVeterinary | IsManager]
+
+class MandatoryTreatmentViewSet(viewsets.GenericViewSet):
+    """
+    List, create, update and retrieve mandatory treatments
+    """
+
+    serializer_class = MandatoryTreatmentModelSerializer
+    list_serializer_class = ListMandatoryTreatmentModelSerializer
+    pagination_class = ExtendedPagination
+    permission_classes = [IsVeterinary | IsManager]
+
+    def get_queryset(self, pk=None):
+        if pk is None:
+            return MandatoryTreatment.objects.all()
+        else:
+            return MandatoryTreatment.objects.filter(
+                id=pk
+            ).first()
+
+    def get_object(self, pk):
+        return get_object_or_404(MandatoryTreatment, pk=pk)
+
+    def list(self, request, *args, **kwargs):
+        """
+        Get a collection of mandatory treatments
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.list_serializer_class(
+                page, many=True, context={"request": request}
+            )
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.list_serializer_class(
+            queryset, many=True, context={"request": request}
+        )
+        return Response(serializer.data)
+
+    def create(self, request):
+        """
+        Create a mandatory treatment
+        """
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(
+                {"message": "tratamiento obligatorio registrado correctamente"},
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(
+            {"message": "Hay errores en el registro", "error": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH
+            ),
+        ],
+    )
+    def retrieve(self, request, pk=None):
+        """
+        Get a mandatory treatment
+        """
+        mandatory_treatment = self.get_object(pk)
+        mandatory_treatment_serializer = self.list_serializer_class(mandatory_treatment)
+        return Response(mandatory_treatment_serializer.data)

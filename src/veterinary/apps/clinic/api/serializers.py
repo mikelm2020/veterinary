@@ -170,7 +170,9 @@ class ListTreatmentAppliedModelSerializer(serializers.ModelSerializer):
     reception = serializers.HyperlinkedRelatedField(
         read_only=True, view_name="receptions-detail"
     )
-    veterinary = serializers.PrimaryKeyRelatedField(queryset=User.objects.veterinaries())
+    veterinary = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.veterinaries()
+    )
 
     class Meta:
         model = TreatmentApplied
@@ -182,10 +184,13 @@ class ListTreatmentAppliedModelSerializer(serializers.ModelSerializer):
             "reception",
             "veterinary",
         )
+
 
 class TreatmentAppliedModelSerializer(serializers.ModelSerializer):
     reception = serializers.PrimaryKeyRelatedField(queryset=Reception.objects.all())
-    veterinary = serializers.PrimaryKeyRelatedField(queryset=User.objects.veterinaries())
+    veterinary = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.veterinaries()
+    )
 
     class Meta:
         model = TreatmentApplied
@@ -197,6 +202,7 @@ class TreatmentAppliedModelSerializer(serializers.ModelSerializer):
             "reception",
             "veterinary",
         )
+
 
 class VeterinarySerializer(serializers.ModelSerializer):
     veterinary_perform = serializers.PrimaryKeyRelatedField(
@@ -209,9 +215,32 @@ class VeterinarySerializer(serializers.ModelSerializer):
 
 
 class MandatoryTreatmentModelSerializer(serializers.ModelSerializer):
-    treatment_applied = serializers.PrimaryKeyRelatedField(
-        queryset=TreatmentApplied.objects.all()
+    treatment_applied = TreatmentAppliedModelSerializer(required=True)
+    treatment = serializers.PrimaryKeyRelatedField(
+        queryset=Treatment.objects.all()
     )
+
+    class Meta:
+        model = MandatoryTreatment
+        fields = (
+            "treatment_applied",
+            "treatment",
+            "drug",
+            "drug_serial",
+        )
+
+    def create(self, validated_data):
+        treatment_applied_data = validated_data.pop('treatment_applied')
+        treatment_applied = TreatmentApplied.objects.create(**treatment_applied_data)
+        mandatory_treatment = MandatoryTreatment.objects.create(
+            treatment_applied=treatment_applied,
+            **validated_data
+        )
+        return mandatory_treatment
+
+
+class ListMandatoryTreatmentModelSerializer(serializers.ModelSerializer):
+    treatment_applied = TreatmentAppliedModelSerializer()
     treatment = serializers.HyperlinkedRelatedField(
         read_only=True, view_name="treatments-detail"
     )
@@ -219,7 +248,6 @@ class MandatoryTreatmentModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = MandatoryTreatment
         fields = (
-            "id",
             "treatment_applied",
             "treatment",
             "drug",
